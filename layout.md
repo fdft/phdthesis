@@ -1,3 +1,6 @@
-abstract.tex
-inputLayoutPreamblet.tex
-sectionAcknowledgmen.tex
+TitlePage.tex
+Abstract.tex
+Acknowledgments.tex
+Introduction.tex
+2ndChapterFileName.tex
+AppendixA.tex
