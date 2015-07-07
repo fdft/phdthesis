@@ -4,3 +4,6 @@
 *.log
 *.toc
 *.synctex.gz
+*.blg
+*.sage-chat
+*.sage-history
