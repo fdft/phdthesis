@@ -1,3 +1,0 @@
-abstract.tex
-inputLayoutPreamblet.tex
-sectionAcknowledgmen.tex
