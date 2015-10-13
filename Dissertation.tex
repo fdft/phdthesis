@@ -37,7 +37,7 @@
    \tableofcontents
    \newpage
    
-   \input{Abstract.tex}
+   \input{abstract.tex}
    \newpage
    
    \section*{Acknowledgments}
@@ -59,6 +59,110 @@
    \chapter{Introduction}
    \label{ch:IntroductionLabel}
    \input{Introduction.tex}
+   
+   %%%%%%%%%%%%%%%%%%%%%%
+   \chapter{Background}
+   \label{ch:background}
+   %\input{background/bg.tex}   
+   
+   In this chapter, we first review some polyhedral decompositions and how these relate to generating functions for the lattice points of a polyhedra. 
+   
+\section{Working with generating functions: an example}
+ 
+ Let us start with an easy example. Consider the one dimensional polyhedra in $\R$ given by $\PP = [0, n]$. We encode the latticd points of $\PP \cap \Z$ by placing each integer point as the power of a monomial, there by obtaining the polynomial $S(\PP; z) := z^0 + z + z^2 + z^3 + \cdots + z^n$. The polynomial $S(\PP; z)$ is called the \emph{generating function of $\PP$.} Notice that counting $\PP \cap \Z$ is equivalat to evaluating $S(\PP, 1)$.
+ 
+ In terms of the computational complexity, listing each monomial in the polynomial $S(\PP, z)$ results in a polynomial with exponential length in the bit length of $n$. However, we can rewrite the summation with one term:
+ 
+ \[ S(\PP, z) = z^0 + z^1 + \cdots + z^n = \frac{1-z^{n+1}}{1-z}.\]
+
+Counting the number of point in $|\PP \cap \Z|$ is no longer as simple as evaluating $\frac{1-z^{n+1}}{1-z}$ at $z=1$ because this is a singularity. However, this singularity is removable. One could perform long-polynomial division, but this would result in a expoentially long polynomial in the bit length of $n$. Another option that yeilds a polynomail time algorithm would be to apply L'Hospital's rule:
+
+\[\lim_{z \rightarrow 1} S(\PP, z) = \lim_{z \rightarrow 1} \frac{-(n+1)z^{n}}{1} = n+1. \]
+
+Notice that $S(\PP, z)$ can be written in two ways:
+
+\[ S(\PP, z) = \frac{1}{1-z} - \frac{z^{n+1}}{1-z} = \frac{1}{1-z} + \frac{z^n}{1-z^{-1}}.\]
+
+The first two rational expressions have a nice description in terms of their series expansion:
+
+\[ 1+z + \cdots + z^n = (z^0 + z^1 + \cdots ) -  (z^{n+1} + z^{n+2} + \cdots).\]
+
+For the secont two rational functions, we have to be careful about the domain of convergence when computing the series expansion. Notice that in the series expansion,
+
+\begin{align*}
+\frac{1}{1-z} =& \begin{cases} 
+      z^0 + z^1 + z^2 \cdots & \;\;\;\;\; \text{ if } |z| < 1 \\
+      -z^{-1} -z^{-2} - z^{-3} - \cdots & \;\;\;\;\; \text{ if }  |z| > 1 
+   \end{cases} \\
+\frac{z^n}{1-z^{-1}} =& \begin{cases} 
+		-z^{n+1} - z^{n+2} - z^{n+3} -\cdots & \text{ if } |z| < 1 \\
+      z^{n} + z^{n-1} + z^{n-2} + \cdots & \text{ if }  |z| > 1 
+   \end{cases} \\
+\end{align*}
+
+
+adding the terms when $|z| <1$  or $|z| > 1$ results in the desired polynomial: $z^0 + z^1 + \cdots + z^n$. But we can also get the correct polynomial by adding the series that corresponds to different domains of convergence. However, to do this we must now add the series $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$ which corresponds to the polyhedra that is the entire real line:
+\begin{align*}
+1 + z + \cdots z^n &= (1 + z + z^2 + \cdots)\\
+& \quad  + (z^n + z^{n-1} + \cdots)  \\
+& \quad - (\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots)
+\end{align*}
+and
+\begin{align*}
+1 + z + \cdots z^n &= (-z^{-1} -z^{-2} - z^{-3} - \cdots)\\
+& \quad  + (-z^{n+1} - z^{n+2} - z^{n+3} -\cdots)  \\
+& \quad + (\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots)
+\end{align*}
+
+Hence by including the series $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$, we can perform the series expansion of $\frac{1}{1-z} + \frac{z^n}{1-z^{-1}}$ by computing the series expansion of each term on potentially different domains of convergence. 
+
+In the next sections, we will develop rigorous justification for adding the series  $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$.
+ 
+\section{Indicator functions}
+
+\begin{definition} 
+The indicator function, $[A]: \R^d \rightarrow \R$, of a set $A \subseteq \R^d$ takes two values: $[A](x) =1$ if $x \in A$ and $[A](x)=0$ otherwise. 
+\end{definition} 
+
+The set of indicator functions on $\R^d$ froms a vectorspace with pointwise additions and scalar multiplication. Notice that $[A]\cdot [B] = [A \cap B]$, and $[A]+[B] = [A \cup B] + [A \cap B]$. 
+
+\begin{definition} The \emph{cone} of a set $A \subseteq \R^d$ is all conic combinations of the points from $A$:
+\[\Cone(A) := \left\{ \sum_i \alpha_i a_i \mid a_i \in A, \alpha_i \in \R_{\geq 0} \right\} \]
+\end{definition} 
+
+\begin{definition} 
+Let $\PP$ be a polyhedron and $x \in \PP$. Then the \emph{tangent cone}, of $\PP$ at $x$ is the polyhedral cone 
+\[\TCone(\PP, x) := x + \Cone(\PP - x)\]  
+\end{definition} 
+ 
+Note that if $x$ is a vertex of $\PP$, and $\PP$ is given by an inequality description, then the tangent cone $\TCone(\PP, x)$ is the intersection of inequalities that are tight at $x$. Also, $\TCone(\PP, x)$ includes the affine hull of the face that $x$ is in, so the tangent cone is pointed only if $x$ is a vertex. 
+
+When $F$ is a face of $\PP$, we will also use the notation $\TCone(\PP, F)$ to denote $\TCone(\PP, x)$ where $x$ is any interior point of $F$.
+
+\begin{theorem}[\cite{brianchon1837}, \cite{gram1871}]
+Let $\PP$ be a polyhedron, then 
+\[[\PP] = \sum_{F} (-1)^{\dim(F)}[\TCone(\PP, F)] \]
+where the sum ranges over all faces $F$ of $\PP$ including $F = \PP$ but excluding $F = \emptyset$
+\end{theorem}
+
+
+   \begin{enumerate}
+   \item ex of a line via polynomial
+   \item 2d tile case
+   \item Brion, tangent cones
+   \item Barvinok
+   
+   \end{enumerate}
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    \chapter[% 
       Short Title of 2nd Ch.
@@ -81,5 +185,5 @@
    \backmatter
    
    \bibliographystyle{amsalpha-fi-arxlast}
-   \bibliography{DissertationBibliography}
+   \bibliography{bibliography/biblio}
 \end{document}

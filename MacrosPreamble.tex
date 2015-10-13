@@ -2,4 +2,109 @@
 % commands that will be used in the dissertation.
 %
 
+\usepackage{amsmath,amsfonts}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{pgf}
+\usepackage{xspace}
+\usepackage{hyperref}
+\usepackage{framed}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}  
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{prop}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{definition}[theorem]{Definition}
+
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+
+\newcommand{\fmax}{f_{\text{\rm max}}}
+\newcommand{\fmin}{f_{\text{\rm min}}}
+\newcommand{\fhan}{f_{\text{\rm han}}}
+
+\newcommand{\C}{{\mathbb C}}
+\newcommand{\R}{{\mathbb R}}
+\newcommand{\Z}{{\mathbb Z}}
+\newcommand{\Q}{{\mathbb Q}}	
+
+
+\let\ve=\mathbf
+\newcommand\fractional[1]{\{#1\}}
+\newcommand\ceil[1]{\lceil{#1}\rceil}
+\newcommand\floor[1]{\lfloor{#1}\rfloor}
+\renewcommand{\ll}{{\langle}}
+\newcommand{\rr}{{\rangle}}
+\newcommand{\reg}{{\mathrm{reg}}}
+\newcommand{\CR}{{\mathcal{B}}}
+\newcommand{\CG}{{\mathcal{G}}}
+\newcommand{\CE}{{\mathcal E}}
+\newcommand{\CF}{{\mathcal F}}
+
+\newcommand{\PP}{{ P}}
+
+\newcommand{\Res}{\operatorname{Res}}
+\newcommand{\res}{\operatorname{res}}
+\newcommand{\Top}{\operatorname{Top}}
+\newcommand{\s}{\mathfrak{s}}
+\newcommand{\Ber}{\operatorname{Ber}}
+\newcommand{\Cone}{\operatorname{Cone}}
+\newcommand{\TCone}{\operatorname{TCone}}
+\newcommand{\Todd}{\operatorname{Todd}}
+\newcommand{\vol}{{\mathrm{\rm vol}}}
+\renewcommand{\ll}{{\langle}}
+\newcommand{\rrr}{{\rangle}}
+\newcommand{\aff}{{\mathrm{\rm aff}}}
+\newcommand{\rhat}{\hat R(T)}
+\newcommand\coneC{\mathfrak{c}}
+\newcommand\coneW{\mathfrak{w}}
+\newcommand\coneU{\mathfrak{u}}
+
+\DeclareMathOperator{\lcm}{lcm}
+\renewcommand\d{\mathrm d}
+\newcommand\e{\mathrm e}
+\newcommand\T{\top}
+
+\newcommand\vexi{\boldsymbol{\xi}}
+\newcommand\vebeta{\boldsymbol{\beta}}
+\newcommand\veeta{\boldsymbol{\eta}}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand\d{\,\mathrm{d}}
+
+
+\newcommand\latteintegrale{{\tt LattE integrale}\xspace} 
+\newcommand\maple{{\tt Maple}\xspace}
+\newcommand\mapleKnapsack{\emph{M-Knapsack}\xspace}
+\newcommand\latteKnapsack{\emph{LattE Knapsack}\xspace}
+\newcommand\coneApx{\emph{LattE Top-Ehrhart}\xspace}
+
+\newcommand\maplecode[1]{\textsf{#1}}
+\newcommand\shellcode[1]{\texttt{#1}}
+
+\newcommand{\tmagenta}[1]{\small \textsf{\textcolor {magenta} {#1}}} % TODO item, no input needed
+\newcommand{\tgreen}[1]{\small \textsf{\textcolor {ForestGreen} {#1}}} % resolved question; no action needed
+\newcommand{\tred}[1]{\small \texttt{\textcolor {red} {#1}}} % open question, input requested
+\newcommand{\tblue}[1]{\small \textsf{\textcolor {blue} {#1}}} % answer to question or comment
+
+
+\newcommand\vealpha{\boldsymbol{\alpha}}
+\renewcommand{\a}{{\vealpha}}
+
+
