@@ -1,0 +1,350 @@
+\chapter{Background}
+\label{ch:background} 
+   
+   In this chapter, we first review some polyhedral decompositions and how these relate to generating functions for the lattice points of a polyhedra. 
+   
+\section{Working with generating functions: an example}
+ 
+ Let us start with an easy example. Consider the one dimensional polyhedra in $\R$ given by $\PP = [0, n]$. We encode the latticd points of $\PP \cap \Z$ by placing each integer point as the power of a monomial, there by obtaining the polynomial $S(\PP; z) := z^0 + z + z^2 + z^3 + \cdots + z^n$. The polynomial $S(\PP; z)$ is called the \emph{generating function of $\PP$.} Notice that counting $\PP \cap \Z$ is equivalat to evaluating $S(\PP, 1)$.
+ 
+ In terms of the computational complexity, listing each monomial in the polynomial $S(\PP, z)$ results in a polynomial with exponential length in the bit length of $n$. However, we can rewrite the summation with one term:
+ 
+ \[ S(\PP, z) = z^0 + z^1 + \cdots + z^n = \frac{1-z^{n+1}}{1-z}.\]
+
+Counting the number of point in $|\PP \cap \Z|$ is no longer as simple as evaluating $\frac{1-z^{n+1}}{1-z}$ at $z=1$ because this is a singularity. However, this singularity is removable. One could perform long-polynomial division, but this would result in a expoentially long polynomial in the bit length of $n$. Another option that yeilds a polynomail time algorithm would be to apply L'Hospital's rule:
+
+\[\lim_{z \rightarrow 1} S(\PP, z) = \lim_{z \rightarrow 1} \frac{-(n+1)z^{n}}{1} = n+1. \]
+
+Notice that $S(\PP, z)$ can be written in two ways:
+
+\[ S(\PP, z) = \frac{1}{1-z} - \frac{z^{n+1}}{1-z} = \frac{1}{1-z} + \frac{z^n}{1-z^{-1}}.\]
+
+The first two rational expressions have a nice description in terms of their series expansion:
+
+\[ 1+z + \cdots + z^n = (z^0 + z^1 + \cdots ) -  (z^{n+1} + z^{n+2} + \cdots).\]
+
+For the secont two rational functions, we have to be careful about the domain of convergence when computing the series expansion. Notice that in the series expansion,
+
+\begin{align*}
+\frac{1}{1-z} =& \begin{cases} 
+      z^0 + z^1 + z^2 \cdots & \;\;\;\;\; \text{ if } |z| < 1 \\
+      -z^{-1} -z^{-2} - z^{-3} - \cdots & \;\;\;\;\; \text{ if }  |z| > 1 
+   \end{cases} \\
+\frac{z^n}{1-z^{-1}} =& \begin{cases} 
+		-z^{n+1} - z^{n+2} - z^{n+3} -\cdots & \text{ if } |z| < 1 \\
+      z^{n} + z^{n-1} + z^{n-2} + \cdots & \text{ if }  |z| > 1 
+   \end{cases} \\
+\end{align*}
+
+
+adding the terms when $|z| <1$  or $|z| > 1$ results in the desired polynomial: $z^0 + z^1 + \cdots + z^n$. But we can also get the correct polynomial by adding the series that corresponds to different domains of convergence. However, to do this we must now add the series $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$ which corresponds to the polyhedra that is the entire real line:
+\begin{align*}
+1 + z + \cdots z^n &= (1 + z + z^2 + \cdots)\\
+& \quad  + (z^n + z^{n-1} + \cdots)  \\
+& \quad - (\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots)
+\end{align*}
+and
+\begin{align*}
+1 + z + \cdots z^n &= (-z^{-1} -z^{-2} - z^{-3} - \cdots)\\
+& \quad  + (-z^{n+1} - z^{n+2} - z^{n+3} -\cdots)  \\
+& \quad + (\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots)
+\end{align*}
+
+Hence by including the series $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$, we can perform the series expansion of $\frac{1}{1-z} + \frac{z^n}{1-z^{-1}}$ by computing the series expansion of each term on potentially different domains of convergence. 
+
+In the next sections, we will develop rigorous justification for adding the series  $\cdots + z^{-2} + z^{-1} + 0 + z + z^2 + \cdots$.
+ 
+\section{Indicator functions}
+
+\begin{definition} 
+The indicator function, $[A]: \R^d \rightarrow \R$, of a set $A \subseteq \R^d$ takes two values: $[A](x) =1$ if $x \in A$ and $[A](x)=0$ otherwise. 
+\end{definition} 
+
+The set of indicator functions on $\R^d$ froms a vectorspace with pointwise additions and scalar multiplication. Notice that $[A]\cdot [B] = [A \cap B]$, and $[A]+[B] = [A \cup B] + [A \cap B]$. 
+
+\begin{definition} The \emph{cone} of a set $A \subseteq \R^d$ is all conic combinations of the points from $A$:
+\[\Cone(A) := \left\{ \sum_i \alpha_i a_i \mid a_i \in A, \alpha_i \in \R_{\geq 0} \right\} \]
+\end{definition} 
+
+\begin{definition} 
+Let $\PP$ be a polyhedron and $x \in \PP$. Then the \emph{tangent cone}, of $\PP$ at $x$ is the polyhedral cone 
+\[\TCone(\PP, x) := x + \Cone(\PP - x)\]  
+\end{definition} 
+ 
+Note that if $x$ is a vertex of $\PP$, and $\PP$ is given by an inequality description, then the tangent cone $\TCone(\PP, x)$ is the intersection of inequalities that are tight at $x$. Also, $\TCone(\PP, x)$ includes the affine hull of the face that $x$ is in, so the tangent cone is pointed only if $x$ is a vertex. 
+
+When $F$ is a face of $\PP$, we will also use the notation $\TCone(\PP, F)$ to denote $\TCone(\PP, x)$ where $x$ is any interior point of $F$.
+
+\begin{theorem}[\cite{brianchon1837}, \cite{gram1871}]
+Let $\PP$ be a polyhedron, then 
+\[[\PP] = \sum_{F} (-1)^{\dim(F)}[\TCone(\PP, F)] \]
+where the sum ranges over all faces $F$ of $\PP$ including $F = \PP$ but excluding $F = \emptyset$
+\end{theorem} 
+
+This theorem is saying that if the generating function of a polytope is desired, it is sufficient to just find the generating function for every face of $\PP$. The next
+ corollary takes this a step further and says it is sufficient to just construct the generating functions associated at each vertex. This is because, as we will see, the generating functions for non-pointed polyhedra can be ignored.
+ 
+\begin{cor}
+\label{cor:tcone-mod-lines}
+Let $\PP$ be a polyhedron, then 
+\[ [\PP] \equiv \sum_{v \in V} [\TCone(\PP, v)] \pmod{\text{indicator functions of non-pointed polyhedra}},\]
+where $V$ is the vertex set of $\PP$.
+\end{cor}
+
+\section{Generating functions of simple cones}
+
+In this section, we quickly review the generating function for summation and integration when the polyhedra is a cone. 
+ 
+The next Proposition serves as a basis for all the summation algorithms we will discus. 
+
+\begin{proposition}[Theorem 13.8 in \cite{barvinokzurichbook}]\label{valuationI}
+There exists a unique valuation  $S(\;\cdot\;,\ell)$ which  associates  to every polyhedron
+$\PP\subset \R^d$ a meromorphic function in $\ell$ so that the following properties hold 
+
+\begin{enumerate}
+\item If $\ell \in \R^d$ such that $e^{\langle \ell, x\rangle}$ is summable over the lattice points of $\PP$, then
+$$
+S(\PP,\ell)= \sum_{\PP \cap \Z^d} e^{\langle \ell,x\rangle}.
+$$
+
+\item For every point $s \in \Z^d$, one has
+$$
+S(s+\PP,\ell) = e^{\langle \ell,s\rangle}S(\PP,\ell).
+$$
+\item If $\PP$ contains a straight line, then $S(\PP,\ell)=0$.
+\end{enumerate}
+\end{proposition}
+
+
+A consequence of the valuation property is the following fundamental theorem. 
+It follows from the Brion--Lasserre--Lawrence--Varchenko decomposition theory of a
+polyhedron into the supporting cones at its vertices \cite{beck-haase-sottile:theorema, Brion88,barvinokzurichbook, lasserre-volume1983}.
+
+
+\begin{lemma} \label{brion-exp} Let $\PP$ be a polyhedron with set of vertices $V(\PP)$. For each
+vertex~$s$, let $C_s(\PP)$ be the cone of feasible directions at vertex $s$. Then
+\begin{equation*}
+S(\PP,\ell)=\sum_{s\in V(\PP)}S(s+C_s(\PP),\ell).
+\end{equation*}
+\end{lemma}
+
+This last lemma can be identified as the natural result of combining Corollary \ref{cor:tcone-mod-lines} and Proposition \ref{valuationI} part (3). A non-pointed polyhedra is another characterization of  a polyhedra that contain a line.
+
+
+Note that the cone $C_s(\PP)$ in Lemma~\ref{brion-exp} may not be simplicial, but for simplicial cones there are explicit rational function formulas. As we will see in Proposition~\ref{prop:integral-exp-simplicial}, one can derive an explicit formula for 
+the rational function $S(s+C_s(\PP),\ell)$ in terms of the geometry of the cones.
+
+\begin{proposition} 
+  \label{prop:summation-exp-simplicial}
+  For a simplicial full-dimensional pointed cone $C$ generated by rays $u_1,u_2,\dots u_d$ (with vertex $0$) and for any point $s$
+\begin{equation*}
+S(s+C,\ell)
+=\sum_{a \in (s+\Pi_C) \cap \Z^d} e^{\langle \ell, a
+  \rangle} \prod_{i=1}^d \frac1{1- e^{\langle \ell, u_i \rangle}}
+\end{equation*}
+
+where $\Pi_c := \{ \sum_{i=1}^d \alpha_i u_i \mid 0 \leq \alpha_i < 1\}$
+These identities holds as a meromorphic function of~$\ell$ 
+and pointwise for every $\ell$ such that $\langle \ell, u_i \rangle \neq 0$ for
+all $u_i$.
+\end{proposition}
+
+The set $\Pi_C$ is often called the \emph{half-open fundamental parallelepiped} of $C$. The continuous generating function for $\PP$ almost mirrors the discrete case. 
+
+\begin{proposition}[Theorem 8.4 in \cite{barvinokzurichbook}]\label{valuationII}
+There exists a unique valuation  $I(\;\cdot\;, \ell)$ which  associates  to every polyhedron
+$\PP\subset \R^d$ a meromorphic function so that the following properties hold 
+
+\begin{enumerate}
+\item If $\ell$ is a linear form such that $e^{\ll \ell, x \rr}$ is integrable over $\PP$ with the standard Lebesgue measure on $\R^d$ , then 
+\[ I(\PP,\ell) = \int_\PP e^{\ll \ell, x \rr} \d x\]
+\item For every point $s \in \R^d$, one has
+\[I(s+\PP, \ell) = e^{\ll \ell, s \rr}I(\PP,\ell).\]
+\item If $\PP$ contains a line, then $I(\PP, \ell) = 0$.
+\end{enumerate}
+\end{proposition}
+
+
+\begin{lemma}  Let $\PP$ be a polyhedron with set of vertices $V(\PP)$. For each
+vertex~$s$, let $C_s(\PP)$ be the cone of feasible directions at vertex $s$. Then
+\begin{equation*}
+I(\PP,\ell)=\sum_{s\in V(\PP)}I(s+C_s(\PP),\ell).
+\end{equation*}
+\end{lemma}
+
+Again, this last lemma can be identified as the natural result of combining Corollary \ref{cor:tcone-mod-lines} and Proposition \ref{valuationII} part (3).
+
+\begin{proposition} 
+  \label{prop:integral-exp-simplicial}
+  For a simplicial full-dimensional pointed cone $C$ generated by rays $u_1,u_2,\dots u_d$ (with vertex $0$) and for any point $s$
+\begin{equation*}
+I(s+C,\ell) = \text{vol} (\Pi_C)e^{\ll \ell, s \rr} \prod_{i=1}^d \frac{1}{-\ll \ell, u_i \rr}.
+\end{equation*}
+These identities holds as a meromorphic function of~$\ell$ 
+and pointwise for every $\ell$ such that $\langle \ell, u_i \rangle \neq 0$ for
+all $u_i$.
+\end{proposition}
+
+\section{Generating function for non-simple cones}
+
+In the last section, we reviewed results that reduced the problem of finding the generating function of $\sum_{x \in \PP \cap \Z^d } e^{\ll \ell, x \rr }$ and $\int_\PP e^{\ll \ell, x \rr} \d x$ of a general polytope $\PP$ to finding the same generating functions of a simplicial cone $C$. This works perfectly if the poltope $\PP$ is simplicial, meaning at every vertex $v$, the cone $\TCone(\PP, v)$ is simplicial. When $\TCone(\PP, v)$ is not simplicial, the solution is to triangulate it.
+
+\begin{definition}
+A triangulation of a cone $C$ is the set $\Gamma$ of simplicial cones $C_i$ of the same dimension as the affine hull of $C$ such that
+\begin{enumerate}
+\item the union of all the simplicial cones in $\Gamma$ is $C$,
+\item the intersection of any pair of simplicial cones in $\Gamma$ is a common face of both simplicial cones,
+\item and every ray of every simplicial cone is also a ray of $C$.
+\end{enumerate}
+\end{definition}
+  
+ Let $C$ be a full-dimensional pointed polyhedral cone, and $\Gamma_1 = \{ C_i \mid i \in I_1\}$ be a triangulation into simplicial cones $C_i$ where $I_1$ is a finite index set. It is true that $C = \cup_{i \in I_1} C_i$, but $[C] = \sum_{i \in I_1} [C_i]$ is false as points on the boundary of two adjacent simplicial cones are counted multiple times. The correct approach is to use the inclusion-exclusion formula:
+ 
+ \[ [C] = \sum_{\emptyset \neq J \subseteq I_1} (-1)^{|J|-1} [\cap_{j \in J} C_j]\]
+
+Also, note that this still holds true when $C$ (and the $C_i$) is shifted by a point $s$. When $|J| \geq 2$, $I(\cap_{j \in J} C_j, \ell) = 0$ as $\cap_{j \in J} C_j$ is not full-dimensional, and the integration is done with respect to the Lebesgue measure on $\R^d$. This leads us to the next lemma.
+
+\begin{lemma}
+\label{lemma:integration-triangulation}
+For any triangulation $\Gamma_s$ of the feasible cone at each of the vertices $s$ of the polytope $\PP$ we have $I(\PP,\ell) = \sum_{s \in V(\PP)} \sum_{C \in \Gamma_s} I(s+C,\ell)$
+\end{lemma}
+
+Lemma \ref{lemma:integration-triangulation} states that we can triangulate a polytope's feasible cones and apply the integration formulas on each simplicial cone without worrying about shared boundaries among the cones. Note that there is no restriction on how the triangulation is performed. 
+
+More care is needed for the discrete case as $S(\cap_{j \in J} C_j, \ell) \neq 0$ when $|J| \geq 2$. We want to avoid using the inclusion-exclusion formula as it contains exponentially many terms (in size of $|I_1|$). 
+
+The discrete case has another complication. Looking at Proposition \ref{prop:summation-exp-simplicial}, we see that the sum 
+
+\[ \sum_{a \in (s+\Pi_C) \cap \Z^d} e^{\ll \ell, a \rr}\]
+
+has to be enumerated. However, there could be an exponential number of points in $(s+\Pi_C) \cap \Z^d$ in terms of the bit length of the simplicial cone $C$. 
+
+We will illustrate one method for solving these problems called the \emph{Dual Barvinok Algorithm}.
+
+
+\subsection{Triangulation}
+\begin{definition}
+Let $A \subseteq \R^d$, the \emph{polar} of $A$ is the set 
+\[ A^\circ = \{ x \in \R^d \mid  \ll x, a \rr \leq 1 \text{ for every } a \in A \}  \]
+\end{definition}
+
+\begin{lemma}
+Cones enjoy many properties under the polar operation. Let $C$ be a finitly generated cone in $\R^d$, then
+
+\begin{enumerate}
+\item $C^\circ = \{ x \in \R^d \mid \ll x, c \rr \leq 0, \forall c \in C \} \}$, 
+\item $C^\circ$ is also a cone,
+\item $(C^\circ)^\circ = C$, and
+\item if $C = \{ x \mid A^Tx \leq 0 \}$, then $C^\circ$ is generated by the columns of $A$.
+\end{enumerate}
+\end{lemma}
+
+The next lemma is core to  Brion's ``polarization trick'' \cite{Brion88} for dealing with the inclusion-exclusion terms.
+
+\begin{lemma}[Theorem 5.3 in \cite{barvinokzurichbook}]
+Let $\mathcal{C}$ be the vector space spanned by the indicator functions of all closed convex sets in $\R^d$. Then there is a unique linear transformation  $\mathcal{D}$ from $\mathcal{C}$ to itself such that $\mathcal{D}([A]) = [A^\circ]$ for all non-empty closed convex sets $A$.
+\end{lemma}
+
+Instead of taking the non-simplicial cone $C$ and triangulating it, we first compute $C^\circ$ and triangulate it to $\Gamma' = \{C_i^\circ \mid i \in I_2 \}$. Then
+
+ \[ [C^\circ] = \sum_{i \in I_2} [C_i^\circ] + \sum_{\emptyset \neq J \subseteq I_2, |J| > 1} (-1)^{|J|-1} [\cap_{j \in J} C_j^\circ].\]
+ 
+ Applying the fact that $(C^\circ)^\circ = C$ and the polar operator is linear, we get
+ 
+  \[ [C] = \sum_{i \in I_2} [C_i] + \sum_{\emptyset \neq J \subseteq I_2, |J| > 1} (-1)^{|J|-1} [(\cap_{j \in J} C_j^\circ)^\circ].\]
+  
+
+Notice that the polar of a full-dimensional pointed cone is another full-dimensional pointed cone. For each $J$ with $|J| \geq 2$, $\cap_{j \in J} C_j^\circ$ is not a full-dimensional cone. The polar of a cone that is not full dimensional is a cone that contains a line. Hence $S((\cap_{j \in J} C_j^\circ)^\circ, \ell) = 0$. By polarizing a cone, triangulating in the dual space, and polarizing back, the boundary terms from the triangulation can be ignored. 
+
+\subsection{Unimodular cones}
+Next, we address the issue that for a simplicial cone $C$, the set $\Pi_C \cap \Z^d$ contains too many terms for an enumeration to be efficient. The approach then is to decompose $C$ into cones that only have one lattice point in the fundamental parallelepiped. Such cones are called \emph{unimodular cones}. Barvinok in \cite{bar} first developed such a decomposition and showed that it can be done in polynomial time when the dimension is fixed. We next give an outline of Barvinok's decomposition algorithm. 
+
+Given a pointed simplicial full-dimensional cone $C$, Barvinok's decomposition method will produce new simplicial cones $C_i$ such that $|\Pi_{C_i} \cap \Z^d| \leq |\Pi_{C} \cap \Z^d|$ and values $\epsilon_i \in \{1, -1\}$ such that
+
+\[ [C] \equiv \sum_{i \in I} \epsilon_i [C_i] \pmod{\text{indicator functions of lower dimensional cones}}.\]
+
+Let $C$ be generated by the rays $u_1, \dots, u_d$. The algorithm first constructs a vector $w$ such that
+ \[w = \alpha_1 u_1 + \cdots + \alpha_d u_d \text{ and } |\alpha_i| \leq |\det(U)|^{-1/d} \leq 1,\]
+ 
+ where the columns of $U$ are the $u_i$. This is done with integer programming or using a lattice basis reduction method \cite{latte1}. Let $K_i = \Cone(u_1, \dots, u_{i-1}, w, u_{i+1}, \dots, u_d)$, then it can be shown that $|\Pi_{K_i} \cap \Z^d| \leq |\Pi_{C} \cap \Z^d|^{\frac{d-1}{d}}$, meaning that these new cones have less integer points in the fundamental parallelepiped than the old cone. This process can be recursively repeated until unimodular cones are obtained. 
+ 
+\begin{theorem}[Barvinok \cite{bar}]
+Let $C$ be a simplicial full-dimensional cone generated by rays $u_1, \dots, u_d$. Collect the rays into the columns of a matrix $U \in \Z^{d \times d}$. Then the depth of the recursive decomposition tree is at most 
+\[ \left\lfloor 1 + \frac{\log_2 \log_2 |\det(U)|}{\log_2 \frac{n}{n-1}} \right\rfloor. \]
+\end{theorem}
+
+Because at each node in the recursion tree has at most $n$ children, and and the depth of the tree is doubly logarithmic in $\det(U)$, only polynomially many unimodular cones are constructed. 
+
+In \cite{bar}, the inclusion-exclusion formula was applied to boundaries between the unimodular cones in the primal space. However, like in triangulation, the decomposition can be applied in the dual space where the lower dimensional cones can be ignored. 
+
+For the full details of Barvinok's decomposition algorithm, see \cite{latte1}, especially Algorithm 5 therein.
+
+This variant of Barvinok’s algorithm has
+efficient implementations in \texttt{LattE}  \cite{latte-1.2} and the library \texttt{barvinok} \cite{barvinok-noversion}.
+
+
+\section{Generating functions for full-dimensional polytopes}
+
+In this section, we explicitly combine the results from the last two sections and write down the polynomial time algorithms for computing the discrete and continuous generating function for a polytope $\PP$.
+
+\begin{algorithm}
+\caption{Barvinok's Dual Algorithm}
+\label{alg:barvinok-dual}
+\begin{justify}
+Output: the rational generating function for $S(\PP, \ell) = \sum\limits_{x \in \PP \cap \Z^d} e^{\langle \ell, x \rangle}$ in the form
+\[S(\PP,\ell) = \sum_{i \in I} \epsilon_i \frac{e^{\langle \ell, v_i \rangle}}{\prod_{j=1}^d ( 1 - e^{\langle \ell, u_{ij}\rangle})}\] 
+where $\epsilon_i \in \{-1,1\}, v_i \in \Z^d$, $u_{ij} \in \Z^d$, and $|I|$ is polynomially bounded in the input size of $\PP$ when $d$ is fixed. Each $i \in I$ corresponds to a simplicial unimodular cone $v_i + C_i$ where $u_{i1}, \dots, u_{id}$ are the $d$ rays of the cone $C_i$.
+\end{justify}
+\begin{enumerate}
+\item  Compute all vertices $v_i$ and corresponding supporting cones $C_i$ of $\PP$
+\item Polarize the supporting cones $C_i$ to obtain $C_i^\circ$
+\item Triangulate $C_i^\circ$ into simplicial cones $C_{ij}^\circ$, discarding lower-dimensional cones
+\item Apply Barvinok’s signed decomposition to the cones $C_{ij}^\circ$ to obtain cones $C_{ijk}^\circ$, which results in the identity
+
+\[ [C^\circ_{ij}] \equiv \sum_{k} \epsilon_{ijk} [C^\circ_{ijk}] \pmod{\text{indicator functions of lower dimensional cones}}.\]
+
+Stop the recursive decomposition when unimodular cones are obtained. Discard all lower-dimensional cones
+\item Polarize back $C_{ijk}^\circ$ to obtain cones $C_{ijk}$
+\item $v_i$ is the unique integer point in the fundamental parallelepiped of every resulting cone $v_i+C_{ijk}$
+\item Write down the above formula
+\end{enumerate}
+\end{algorithm}
+
+The key part of this variant of Barvinok's algorithm is that computations with rational generating are simplified when non-pointed cones are used. The reason is that the rational generating
+function of every non-pointed cone is zero. By operating in the dual space, when computing the polar cones, lower-dimensional cones can be safely discarded because this is equivalent to discarding non-pointed cones in the primal space. 
+
+Triangulating a non-simplicial cone in the dual space was done to avoid the many lower-dimensional terms that arise from using the inclusion-exclusion formula for the indicator function of the cone. Other was to get around this exist. In \cite{koeppe:irrational-barvinok, beck-sottile:irrational, beck-haase-sottile:theorema}, irrational decompositions where developed which are decompositions of polyhedra whose proper faces do not contain any lattice points. Counting formulas for lattice points that are constructed with irrational decompositions do not need the inclusion-exclusion principle. The implementation of this idea \cite{latte-macchiato} was the first practically efficient variant of Barvinok’s algorithm that works in the primal space.
+
+
+For an extremely well written discussion on other practical algorithms to solve these problems using slightly different decompositions, see \cite{koeppe:irrational-barvinok}. 
+
+
+For completeness, we end with the algorithmic description for the continuous generating function. 
+
+\begin{algorithm}
+\caption{Continuous generating function}
+
+\begin{justify}
+Output: the rational generating function for $I(\PP, \ell) = \int\limits_{\PP} e^{\langle \ell, x \rangle}\d x$ in the form
+
+\[ I(\PP,\ell) = \sum_{s \in V(\PP)} \sum_{C \in \Gamma_s} \text{vol} (\Pi_C)e^{\ll \ell, s \rr} \prod_{i=1}^d \frac{1}{-\ll \ell, u_i \rr}. \]
+
+where $u_1, \dots, u_d$ are the rays of cone $C$.
+\end{justify}
+\begin{enumerate}
+\item  Compute all vertices $V(\PP)$ and corresponding supporting cones $\Cone(\PP - s)$
+\item Triangulate $\Cone(\PP - s)$ into a collection of simplicial cones $\Gamma_s$ using any method
+\item Write down the above
+\end{enumerate}
+\end{algorithm} 
+ 
+
+Note that in fixed dimension, the above algorithms compute the generating functions in polynomial time. 
+   
+   
+   \begin{figure}[h!]
+  \caption{To remove, no graphic needed?}
+  \centering
+    \includegraphics[width=0.5\textwidth]{figures/fruit.jpg}
+\end{figure}
+   
